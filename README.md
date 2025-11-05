@@ -15,8 +15,13 @@ A real-time interactive Bézier curve simulation that demonstrates mathematical 
 - **Tangent Vectors**: `B'(t) = 3(1−t)²(P₁−P₀) + 6(1−t)t(P₂−P₁) + 3t²(P₃−P₂)`
 - **Physics**: Spring-damping model: `acceleration = -k × displacement - damping × velocity`
 
+## 🎥 Live Demo
+
+[**Output**](https://drive.google.com/file/d/1Zu_cWLO0RH2OhmHWoBf9amRGWlerXs2A/view?usp=sharing)
+
 ## Run Locally
 ```bash
 git clone https://github.com/Sunny22110010324/bezier-curve.git
 cd bezier-curve
 # Open index.html in web browser
+
