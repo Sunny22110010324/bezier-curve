@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bézier Curve - Live Math & Physics Display</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #00ff00;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .canvas-container {
+            flex: 1;
+            min-width: 600px;
+        }
+        .math-display {
+            flex: 1;
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            font-size: 14px;
+            overflow-y: auto;
+            max-height: 540px;
+            min-width: 500px;
+        }
+        canvas { 
+            border: 2px solid #444; 
+            background: #2a2a2a;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .math-line {
+            margin: 8px 0;
+            padding: 8px;
+            border-left: 3px solid #007acc;
+            background: rgba(0, 122, 204, 0.1);
+            word-break: break-all;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        h1 {
+            color: #569cd6;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        h2, h3 {
+            color: #569cd6;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+        .value {
+            color: #ce9178;
+            font-weight: bold;
+        }
+        .formula {
+            color: #dcdcaa;
+            font-style: italic;
+            background: rgba(220, 220, 170, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+            margin: 8px 0;
+        }
+        .subtitle {
+            text-align: center;
+            color: #bbb;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Bézier Curve - Live Math & Physics Display</h1>
+    <p class="subtitle">Move your cursor to see real-time calculations • Click for stronger physics effect</p>
+    
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: #2ecc71;"></div>
+            <span>Fixed Points (P₀, P₃)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #e67e22;"></div>
+            <span>Dynamic Points (P₁, P₂)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #3498db;"></div>
+            <span>Bézier Curve</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #e74c3c;"></div>
+            <span>Tangent Vectors</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ffeb3b;"></div>
+            <span>Moving Point B(t)</span>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="canvas-container">
+            <canvas id="canvas" width="800" height="500"></canvas>
+        </div>
+        
+        <div class="math-display" id="mathDisplay">
+            <div class="section">
+                <h2>📊 Live Data</h2>
+                <div class="math-line">Mouse Position: <span id="mousePos" class="value">(0, 0)</span></div>
+                <div class="math-line">Frame Rate: <span id="fps" class="value">60 FPS</span></div>
+                <div class="math-line">Current Time Parameter (t): <span id="currentT" class="value">0.50</span></div>
+                <div class="math-line">Mouse Interaction: <span id="mouseState" class="value">No Click</span></div>
+            </div>
+
+            <div class="section">
+                <h2>🎯 Control Points</h2>
+                <div class="math-line">P₀ (Fixed Start): <span id="p0" class="value">(100, 300)</span></div>
+                <div class="math-line">P₁ (Dynamic): <span id="p1" class="value">(250, 100)</span></div>
+                <div class="math-line">P₂ (Dynamic): <span id="p2" class="value">(550, 100)</span></div>
+                <div class="math-line">P₃ (Fixed End): <span id="p3" class="value">(700, 300)</span></div>
+            </div>
+
+            <div class="section">
+                <h2>📐 Bézier Curve Math</h2>
+                <div class="formula">B(t) = (1−t)³P₀ + 3(1−t)²tP₁ + 3(1−t)t²P₂ + t³P₃</div>
+                <div class="math-line">Current Point on Curve B(t): <span id="bezierPoint" class="value">(0, 0)</span></div>
+                <div class="math-line">Parameter t (0 to 1): <span id="paramT" class="value">0.50</span></div>
+            </div>
+
+            <div class="section">
+                <h2>📈 Tangent Vector Calculation</h2>
+                <div class="formula">B'(t) = 3(1−t)²(P₁−P₀) + 6(1−t)t(P₂−P₁) + 3t²(P₃−P₂)</div>
+                <div class="math-line" id="tangentFormula">
+                    <em>Move cursor to see live calculation...</em>
+                </div>
+                <div class="math-line">Tangent Vector B'(t): <span id="tangent" class="value">(0, 0)</span></div>
+                <div class="math-line">Tangent Magnitude: <span id="tangentMag" class="value">0</span></div>
+                <div class="math-line">Normalized Tangent: <span id="normalizedTangent" class="value">(0, 0)</span></div>
+            </div>
+
+            <div class="section">
+                <h2>⚡ Physics Simulation</h2>
+                <div class="formula">acceleration = -k × (position - target) - damping × velocity</div>
+                <div class="math-line">Spring Constant (k): <span id="springK" class="value">0.1</span></div>
+                <div class="math-line">Damping Factor: <span id="damping" class="value">0.85</span></div>
+                <div class="math-line">P₁ Velocity: <span id="velocity1" class="value">(0.00, 0.00)</span></div>
+                <div class="math-line">P₂ Velocity: <span id="velocity2" class="value">(0.00, 0.00)</span></div>
+                <div class="math-line">P₁ Acceleration: <span id="accel1" class="value">(0.00, 0.00)</span></div>
+                <div class="math-line">P₂ Acceleration: <span id="accel2" class="value">(0.00, 0.00)</span></div>
+            </div>
+
+            <div class="section">
+                <h2>🎓 Explanation</h2>
+                <div class="math-line">• <strong>Yellow Point</strong>: Shows B(t) moving along curve</div>
+                <div class="math-line">• <strong>Red Lines</strong>: Tangent vectors showing curve direction</div>
+                <div class="math-line">• <strong>Orange Points</strong>: P₁ & P₂ follow mouse with spring physics</div>
+                <div class="math-line">• <strong>Green Points</strong>: P₀ & P₃ are fixed endpoints</div>
+                <div class="math-line">• <strong>t parameter</strong>: Goes from 0 (start) to 1 (end) of curve</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="bezier.js"></script>
+</body>
+</html>
